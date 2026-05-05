@@ -1,0 +1,8 @@
+tensorflow
+tf-keras
+numpy
+scipy
+matplotlib
+gradio
+simpleaudio
+Pillow
