@@ -1,39 +1,39 @@
-# 專案相依套件安裝指南 (Installation Guide)
+# Project Dependency Installation Guide
 
-本專案使用 Python 開發，並依賴以下第三方套件來處理音訊、執行深度學習模型推論與繪製圖表。
+This project is developed in Python and relies on the following third-party packages to process audio, execute deep learning model inference, and render charts.
 
-## 必備套件清單
+## Required Packages List
 
-根據專案的程式碼分析，執行此專案需要安裝以下外部套件：
+Based on the code analysis of the project, executing this project requires installing the following external packages:
 
-1. **`tensorflow`** 與 **`tf-keras`**
-   - **用途**：用於載入與執行預先訓練好的 DNN/CNN 助聽器補償模型（Keras `.json` 與 `.h5` 格式）。由於專案模型是由舊版 Keras 儲存，在新版 TensorFlow 中需要 `tf-keras` 來支援載入。
+1. **`tensorflow`** and **`tf-keras`**
+   - **Purpose**: Used for loading and executing pre-trained DNN/CNN hearing aid compensation models (Keras `.json` and `.h5` formats). Because the project models were saved by an older version of Keras, `tf-keras` is required to support loading in the newer versions of TensorFlow.
 2. **`numpy`**
-   - **用途**：提供高效能的多維陣列與矩陣運算，用於處理音訊數據的計算（如均方根值、陣列操作等）。
+   - **Purpose**: Provides high-performance multi-dimensional array and matrix operations, used for computing audio data (such as root mean square, array manipulations, etc.).
 3. **`scipy`**
-   - **用途**：主要用於讀寫 `.wav` 音檔（`scipy.io.wavfile`）以及執行進階的音訊信號處理，例如重新取樣與頻譜圖分析（`scipy.signal`）。
+   - **Purpose**: Primarily used for reading and writing `.wav` audio files (`scipy.io.wavfile`) and executing advanced audio signal processing, such as resampling and spectrogram analysis (`scipy.signal`).
 4. **`matplotlib`**
-   - **用途**：用於將處理結果視覺化，繪製處理前後的音訊波形圖、頻譜圖及倍頻程分析圖。
+   - **Purpose**: Used for visualizing the processed results, plotting the audio waveforms, spectrograms, and octave band analysis charts before and after processing.
 5. **`gradio`**
-   - **用途**：建立穩定且強大的 Web 圖形化介面，負責音訊播放與參數調整。
+   - **Purpose**: Builds a stable and robust Web graphical user interface, responsible for audio playback and parameter adjustment.
 6. **`Pillow`**
-   - **用途**：用於 Web GUI 中高效能的聽力圖 (Audiogram) 視覺化渲染。
+   - **Purpose**: Used for high-performance Audiogram visualization rendering in the Web GUI.
 
-*(註：`time`, `os`, `sys` 為 Python 內建標準函式庫，不需額外安裝。)*
+*(Note: `time`, `os`, and `sys` are built-in Python standard libraries and do not require additional installation.)*
 
-## 安裝與執行方式 (推薦使用虛擬環境)
+## Installation and Execution (Virtual Environment Recommended)
 
-強烈建議在專案中使用 Python 虛擬環境（如 `.venv`）來安裝這些套件，這可以避免與系統或其他專案的套件版本發生衝突。
+It is highly recommended to use a Python virtual environment (such as `.venv`) in the project to install these packages. This can prevent version conflicts with system packages or other projects.
 
-### 步驟 1：建立虛擬環境
-在專案根目錄下打開終端機，執行以下指令來建立名為 `.venv` 的虛擬環境：
+### Step 1: Create a Virtual Environment
+Open a terminal in the project root directory and execute the following command to create a virtual environment named `.venv`:
 
 ```bash
 python3 -m venv .venv
 ```
 
-### 步驟 2：啟動虛擬環境
-根據您的作業系統，執行以下指令來啟動虛擬環境：
+### Step 2: Activate the Virtual Environment
+Depending on your operating system, execute the following command to activate the virtual environment:
 
 *   **Linux / macOS**:
     ```bash
@@ -43,30 +43,30 @@ python3 -m venv .venv
     ```cmd
     .venv\Scripts\activate
     ```
-*(啟動成功後，您的命令列提示字元開頭應該會顯示 `(.venv)`)*
+*(After successful activation, your command line prompt should start with `(.venv)`)*
 
-### 步驟 3：安裝相依套件
-在確認虛擬環境啟動的狀態下，使用 `pip` 安裝專案根目錄下 `requirements.txt` 所列的所有需要的套件：
+### Step 3: Install Dependencies
+While ensuring the virtual environment is activated, use `pip` to install all required packages listed in `requirements.txt` located in the project root directory:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 步驟 4：執行程式
-安裝完成後，建議執行基於 Web 的圖形化介面，這會提供更直覺的操作與音訊比較功能：
+### Step 4: Run the Application
+After installation is complete, it is recommended to run the Web-based graphical interface, which provides a more intuitive operation and audio comparison function:
 
 *   **Linux**: `./rungui.sh`
 *   **Windows**: `rungui.bat`
 
-*(啟動後請在瀏覽器中開啟終端機顯示的本地網址)*
+*(After starting, please open the local URL displayed in the terminal in your browser)*
 
-若要執行傳統的終端機測試腳本，請執行：
+If you want to run the traditional terminal test script, please execute:
 
 *   **Linux**: `./run.sh`
 *   **Windows**: `run.bat`
 
-### 離開虛擬環境
-當您完成專案工作想退出虛擬環境時，只需在終端機中輸入：
+### Deactivate the Virtual Environment
+When you have finished working on the project and want to exit the virtual environment, simply enter the following in the terminal:
 
 ```bash
 deactivate
