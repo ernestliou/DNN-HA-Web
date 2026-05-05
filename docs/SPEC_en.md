@@ -1,4 +1,4 @@
-# Project Python Files Specification
+# Project Python Files Specification 
 
 This project is primarily used to demonstrate and test the deep neural network (DNN) based hearing-aid (HA) audio processing strategy. The project contains multiple main Python files, which are responsible for the Web frontend graphical interface, the main testing workflow, audio processing utility functions, and frequency band analysis filters.
 

@@ -1,4 +1,4 @@
-# 專案 Python 檔案分析文件 (Project Python Files Specification)
+# 專案 Python 檔案分析文件 (Project Python Files Specification) 
 
 本專案主要用於展示與測試基於深度神經網路（DNN）的助聽器（Hearing-Aid, HA）音訊處理策略。專案內包含多個主要的 Python 檔案，分別負責 Web 前端圖形化介面、主程式測試流程、音訊處理輔助函數，以及頻帶分析濾波器。
 
