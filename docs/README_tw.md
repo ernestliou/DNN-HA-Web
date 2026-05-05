@@ -1,6 +1,6 @@
 # 基於深度神經網路 (DNN) 的即時助聽器處理策略 - 網頁測試平台 (DNN-HA Web GUI)
 
-[English](../README.md) | [繁體中文](README_tw.md)
+[English](docs/README_en.md) | [繁體中文](docs/README_tw.md)
 
 本專案是一個由 **CHAO-CHIA, LIU** 開發與維護的**衍生測試平台**。其底層的核心音訊處理邏輯與深度神經網路（DNN）模型，是完全基於原作者 [Fotios Drakopoulos 等人所發表的 DNN-HA 專案](https://github.com/fotisdr/DNN-HA) 所改寫與封裝。
 
