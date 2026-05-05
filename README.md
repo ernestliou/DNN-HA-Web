@@ -1,6 +1,6 @@
 # DNN-Based Hearing-Aid Strategy for Real-Time Processing - Web Testing Platform (DNN-HA Web GUI)
 
-[English](README.md) | [繁體中文](docs/README_tw.md)
+[English](README_en.md) | [繁體中文](README_tw.md)
 
 This project is a **derivative testing platform** developed and maintained by **CHAO-CHIA, LIU**. Its underlying core audio processing logic and deep neural network (DNN) models are entirely based on, adapted from, and wrapped around the [DNN-HA project published by Fotios Drakopoulos et al.](https://github.com/fotisdr/DNN-HA).
 
@@ -18,7 +18,7 @@ While the core AI model comes from the original authors, this derivative project
 
 ## 🚀 How to Launch this Testing Platform
 
-Please refer to the instructions in [docs/install_pkgs.md](install_pkgs.md) to set up a Python virtual environment and install dependencies.
+Please refer to the instructions in [docs/install_pkgs.md](docs/install_pkgs.md) to set up a Python virtual environment and install dependencies.
 
 ### Launch the Web Interface (Recommended)
 

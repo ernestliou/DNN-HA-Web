@@ -18,7 +18,7 @@ While the core AI model comes from the original authors, this derivative project
 
 ## 🚀 How to Launch this Testing Platform
 
-Please refer to the instructions in [docs/install_pkgs.md](install_pkgs.md) to set up a Python virtual environment and install dependencies.
+Please refer to the instructions in [docs/install_pkgs.md](docs/install_pkgs.md) to set up a Python virtual environment and install dependencies.
 
 ### Launch the Web Interface (Recommended)
 

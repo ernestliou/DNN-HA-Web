@@ -18,7 +18,7 @@
 
 ## 🚀 如何啟動本測試平台
 
-請先參考 [docs/install_pkgs.md](install_pkgs.md) 的指示，建立 Python 虛擬環境並安裝相依套件。
+請先參考 [docs/install_pkgs.md](docs/install_pkgs.md) 的指示，建立 Python 虛擬環境並安裝相依套件。
 
 ### 啟動 Web 介面 (推薦)
 
