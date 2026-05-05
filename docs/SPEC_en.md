@@ -16,7 +16,7 @@ The frontend interface developed based on the Gradio framework aims to provide a
 *   **`gui/i18n.py` (Internationalization Module)**:
     Implements a dynamic language switching mechanism, reads locale files from the `locale/` directory, and supports automatic detection of the system language upon startup.
 *   **`gui/v1/` (Historical Backup)**:
-    Stores the monolithic `web_app.py` code from before the refactoring.
+    Stores the monolithic `web_app.py` and the legacy Tkinter `app.py` code from before the refactoring.
 
 ## 2. `sys/test_DNN-HA_wavfile.py`
 **Role**: Main Program / Test Script
@@ -45,7 +45,7 @@ Implements Octave-Band and Fractional Octave-Band filters. This file is primaril
 *   `octavefilter`: The main API of the module, used to pass the signal through multiple (fractional) octave-band filters and calculate the Sound Pressure Level (SPL) and corresponding frequency array for each band.
 *   `getansifrequencies` / `normalizedfreq`: Calculates and generates the standard center frequencies, lower bound frequencies, and upper bound frequencies for octave or one-third octave bands according to ANSI S1.11-2004 and IEC 61260-1-2014 standards.
 
-## 5. `gui/app.py`
+## 5. `gui/v1/app.py`
 **Role**: Legacy Desktop Graphical User Interface (Tkinter GUI)
 **Description**:
 This is the early Tkinter-based desktop application interface of the project, currently serving as a backup or reference.
