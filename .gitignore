@@ -1,0 +1,5 @@
+.venv
+AI_Reference.md
+docs/AI_Reference.md
+__pycache__/
+*.pyc
