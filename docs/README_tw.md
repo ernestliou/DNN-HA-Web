@@ -15,6 +15,7 @@
 3. **高階數據與圖表分析**：內建時域波形 (Waveform)、頻譜圖 (Spectrogram) 及 1/3 倍頻程分析 (1/3 Octave Band) 等專業圖表，並加入「語言香蕉區 (Speech Banana)」作為臨床參考。
 4. **純音產生器 (Pure Tone Generator)**：整合 Web Audio API 的即時音訊合成器，方便快速進行聽力測試或設備校準。
 5. **多語系介面 (Multilingual Interface)**：支援**英文 (en_US)** 與**繁體中文 (zh_TW)**。系統會自動偵測作業系統語言，並提供下拉選單進行即時切換。
+6. **極重度聽損支援與安全防護機制**：將聽力圖輸入範圍擴展至 120 dB HL，並實作後置 DSP 濾波器來呈現大於 90 dB 的「死區 (Dead Regions)」與大於 70 dB 的 IHC 線性衰減與動態範圍壓縮還原，同時確保 AI 核心推論的安全邊界 (Clipping)。
 
 ## 🚀 如何啟動本測試平台
 

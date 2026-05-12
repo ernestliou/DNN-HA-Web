@@ -9,10 +9,16 @@ import sys
 import os
 from PIL import Image
 
+# 自動尋找系統中可用的中文字型
+plt.rcParams['font.sans-serif'] = ['Microsoft JhengHei', 'Arial Unicode MS', 'Noto Sans TC', 'sans-serif']
+plt.rcParams['axes.unicode_minus'] = False # 修復負號顯示問題
+
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys_dir = os.path.join(project_root, "sys")
 if sys_dir not in sys.path:
     sys.path.append(sys_dir)
+
+from gui.i18n import get_i18n
 
 try:
     import PyOctaveBand
@@ -71,6 +77,8 @@ def create_analysis_plot(audio_data, fs, title):
     return fig
 
 def plot_audiogram_figure(*losses):
+    t_msg = get_i18n()
+    
     try:
         losses = [float(l) if l is not None else 0.0 for l in losses]
     except:
@@ -81,7 +89,7 @@ def plot_audiogram_figure(*losses):
     
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     
-    fig = Figure(figsize=(6, 4))
+    fig = Figure(figsize=(8, 5))
     canvas = FigureCanvas(fig)
     ax = fig.subplots()
     freqs = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000]
@@ -101,12 +109,19 @@ def plot_audiogram_figure(*losses):
     ax.xaxis.set_label_position('top')
     ax.set_xlabel('Freq (Hz)', loc='right')
     ax.set_ylabel('Loss (dB)')
-    ax.set_title("Audiogram", fontsize=16, pad=20)
+    ax.set_title(t_msg.get("plot_title", "Audiogram"), fontsize=16, pad=20)
     
     ax2 = ax.twinx()
     ax2.set_ylim(120, -10)
-    ranges = [(-10, 20, 'Normal'), (20, 40, 'Mild'), (40, 55, 'Moderate'), 
-              (55, 70, 'Mod-Severe'), (70, 90, 'Severe'), (90, 120, 'Profound')]
+    
+    ranges = [
+        (-10, 20, t_msg.get("plot_y_normal", 'Normal')), 
+        (20, 40, t_msg.get("plot_y_mild", 'Mild')), 
+        (40, 55, t_msg.get("plot_y_moderate", 'Moderate')), 
+        (55, 70, t_msg.get("plot_y_mod_severe", 'Mod-Severe')), 
+        (70, 90, t_msg.get("plot_y_severe", 'Severe')), 
+        (90, 120, t_msg.get("plot_y_profound", 'Profound'))
+    ]
     
     yticks2 = []
     ylabels2 = []
@@ -149,6 +164,19 @@ def plot_audiogram_figure(*losses):
         closed=True, color='lightgray', alpha=0.5, edgecolor=None
     )
     ax.add_patch(banana_polygon)
+    
+    # 補償極限線與區域標示
+    ax.axhline(40, color='blue', linestyle='--', linewidth=1.5, alpha=0.6)
+    ax.text(6.4, 38, t_msg.get("plot_ai_core", 'AI 核心處理範圍'), color='blue', ha='right', va='bottom', fontsize=10, fontweight='bold')
+    
+    ax.text(6.4, 70, t_msg.get("plot_dsp_linear", 'DSP 線性補償區'), color='darkorange', ha='right', va='center', fontsize=10, fontweight='bold', alpha=0.8)
+    
+    # 標示死區 (Dead Regions)
+    dead_region_text = t_msg.get("plot_dead_region", '死區')
+    for x, l in zip(x_pos, losses):
+        if l >= 90:
+            ax.fill_between([x-0.15, x+0.15], [l, l], [120, 120], color='red', alpha=0.3)
+            ax.text(x, l + 5, dead_region_text, color='darkred', ha='center', va='top', fontsize=9, fontweight='bold')
     
     ax.plot(x_pos, losses, marker='o', markersize=8, markerfacecolor='none', 
             markeredgecolor='red', markeredgewidth=2,

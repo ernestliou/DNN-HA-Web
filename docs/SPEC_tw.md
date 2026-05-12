@@ -10,9 +10,9 @@
 *   **`gui/web_app.py` (主程式 / UI 控制器)**：
     負責定義介面佈局與事件綁定。包含「檔案處理」、「即時麥克風串流」、「視覺化數據分析」、「聽力圖設定」與「純音產生器 (Web Audio API)」等分頁。提供無縫的跨平台音訊播放與使用者互動體驗。
 *   **`gui/audio_engine.py` (核心邏輯與推論引擎)**：
-    負責載入 TensorFlow 模型並執行音訊訊號處理。實作了基於 FIR 濾波器的即時「聽損模擬 (Hearing Loss Simulation)」，並處理檔案模式 (`process_audio`) 與麥克風模式 (`stream_process`) 的「AI 補償」推論。支援動態調整目標音壓 (SPL)、訊噪比 (SNR) 及額外增益。
+    負責載入 TensorFlow 模型並執行音訊訊號處理。實作了基於 FIR 濾波器的即時「聽損模擬 (Hearing Loss Simulation)」，並處理檔案模式 (`process_audio`) 與麥克風模式 (`stream_process`) 的「AI 補償」推論。包含推論防護機制 (安全截斷輸入至 70 dB) 與後置 DSP 濾波器 (`apply_post_mask`, `apply_profound_loss_logic`) 以模擬死區等極重度聽損特性。支援動態調整目標音壓 (SPL)、訊噪比 (SNR) 及額外增益。
 *   **`gui/visualizer.py` (視覺化與繪圖模組)**：
-    負責產生介面上的各式圖表。包含 `create_analysis_plot` (提供時域波形、頻譜圖與 1/3 倍頻程分析) 以及 `plot_audiogram_figure` (利用高效能的 Pillow 渲染聽力圖，並繪製作為臨床參考的「語言香蕉區」)。
+    負責產生介面上的各式圖表。包含 `create_analysis_plot` (提供時域波形、頻譜圖與 1/3 倍頻程分析) 以及 `plot_audiogram_figure` (利用高效能的 Pillow 渲染聽力圖，並繪製作為臨床參考的「語言香蕉區」、標示「AI 核心處理範圍」、「DSP 線性補償區」與「死區」)。
 *   **`gui/i18n.py` (多語系模組)**：
     實作動態語言切換機制，讀取 `locale/` 語系檔，並支援啟動時自動偵測系統語系。
 *   **`gui/v1/` (歷史備份)**：

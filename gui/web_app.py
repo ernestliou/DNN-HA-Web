@@ -44,19 +44,24 @@ def save_audiogram_to_file(*args):
     except Exception as e:
         return t_msg.get("msg_audio_save_err", "").format(err=str(e))
 
-def load_audiogram_from_file(file):
+def load_audiogram_from_file(file, is_profound):
     t_msg = get_i18n()
     if file is None:
-        return [gr.update()] * 9 + [t_msg.get("msg_audio_pls_file", "")]
+        return [gr.update()] * 9 + [gr.update(), t_msg.get("msg_audio_pls_file", "")]
     try:
         with open(file.name, 'r') as f:
             data = json.load(f)
             if isinstance(data, list) and len(data) == 9:
-                return [float(val) for val in data] + [t_msg.get("msg_audio_loaded", "")]
+                vals = [float(val) for val in data]
+                needs_profound = any(v > 70 for v in vals)
+                new_profound = True if needs_profound else is_profound
+                max_val = 120 if new_profound else 70
+                updates = [gr.update(value=min(v, max_val), maximum=max_val) for v in vals]
+                return updates + [gr.update(value=new_profound), t_msg.get("msg_audio_loaded", "")]
             else:
-                return [gr.update()] * 9 + [t_msg.get("msg_audio_fmt_err", "")]
+                return [gr.update()] * 9 + [gr.update(), t_msg.get("msg_audio_fmt_err", "")]
     except Exception as e:
-        return [gr.update()] * 9 + [t_msg.get("msg_audio_load_err", "").format(err=str(e))]
+        return [gr.update()] * 9 + [gr.update(), t_msg.get("msg_audio_load_err", "").format(err=str(e))]
 
 initial_audiogram_image = plot_audiogram_figure(*default_audiogram)
 
@@ -182,16 +187,21 @@ with gr.Blocks(title="DNN-HA Web UI") as demo:
 
         with gr.Tab(t.get("tab_audiogram")) as tab_audiogram:
             with gr.Row():
-                with gr.Column(scale=1):
+                with gr.Column(scale=4):
                     with gr.Group():
                         ui_audio_title = gr.Markdown(t.get("audio_title"))
+                        is_profound_default = any(v > 70 for v in default_audiogram)
+                        cb_profound = gr.Checkbox(label="啟動極重度聽損模式（Profound Mode）", value=is_profound_default)
+                        
                         audio_inputs = []
-                        for i in range(0, 9, 3):
+                        for i in range(0, 9, 2):
                             with gr.Row():
-                                for j in range(3):
-                                    idx = i + j
-                                    num_input = gr.Number(value=default_audiogram[idx], label=f"{FREQS[idx]} Hz")
-                                    audio_inputs.append(num_input)
+                                for j in range(2):
+                                    if i + j < 9:
+                                        idx = i + j
+                                        max_val = 120 if is_profound_default else 70
+                                        num_input = gr.Slider(minimum=-10, maximum=max_val, step=1, value=default_audiogram[idx], label=f"{FREQS[idx]} Hz")
+                                        audio_inputs.append(num_input)
                         
                         with gr.Row():
                             btn_save_audio = gr.Button(t.get("btn_save_audio"), size="sm")
@@ -199,7 +209,7 @@ with gr.Blocks(title="DNN-HA Web UI") as demo:
                             btn_update_plot = gr.Button(t.get("btn_update_plot"), size="sm")
                             save_audio_status = gr.Markdown("")
                             
-                with gr.Column(scale=1):
+                with gr.Column(scale=5):
                     audiogram_plot = gr.Image(value=initial_audiogram_image, label=t.get("audiogram_plot_lbl"), type="pil", interactive=False)
 
         with gr.Tab(t.get("tab_tone"), id="tab_tone") as tab_tone:
@@ -230,7 +240,7 @@ with gr.Blocks(title="DNN-HA Web UI") as demo:
     # --- 事件串接 ---
     
     # 檔案處理模式
-    all_file_inputs = [in_audio, in_L, in_SNR, in_frame, in_sim_gain] + audio_inputs
+    all_file_inputs = [in_audio, in_L, in_SNR, in_frame, in_sim_gain, cb_profound] + audio_inputs
     btn_process.click(
         fn=process_audio,
         inputs=all_file_inputs,
@@ -257,7 +267,7 @@ with gr.Blocks(title="DNN-HA Web UI") as demo:
     ).then(lambda: gr.update(selected="tab_analysis"), outputs=tabs)
 
     # 麥克風即時模式
-    all_mic_inputs = [mic_input, mic_mode, mic_L, mic_sim_gain] + audio_inputs
+    all_mic_inputs = [mic_input, mic_mode, mic_L, mic_sim_gain, cb_profound] + audio_inputs
     mic_input.stream(
         fn=stream_process,
         inputs=all_mic_inputs,
@@ -321,8 +331,8 @@ with gr.Blocks(title="DNN-HA Web UI") as demo:
     # 聽力圖讀取
     btn_load_audio.upload(
         fn=load_audiogram_from_file,
-        inputs=[btn_load_audio],
-        outputs=audio_inputs + [save_audio_status]
+        inputs=[btn_load_audio, cb_profound],
+        outputs=audio_inputs + [cb_profound, save_audio_status]
     ).then(
         fn=plot_audiogram_figure,
         inputs=audio_inputs,
@@ -336,11 +346,30 @@ with gr.Blocks(title="DNN-HA Web UI") as demo:
         outputs=audiogram_plot
     )
     for num_input in audio_inputs:
-        num_input.submit(
+        num_input.release(
             fn=plot_audiogram_figure,
             inputs=audio_inputs,
             outputs=audiogram_plot
         )
+        
+    # 極重度模式切換事件
+    def toggle_profound_mode(is_profound, *current_vals):
+        max_val = 120 if is_profound else 70
+        updates = []
+        for v in current_vals:
+            new_v = min(v, max_val)
+            updates.append(gr.update(maximum=max_val, value=new_v))
+        return updates
+
+    cb_profound.change(
+        fn=toggle_profound_mode,
+        inputs=[cb_profound] + audio_inputs,
+        outputs=audio_inputs
+    ).then(
+        fn=plot_audiogram_figure,
+        inputs=audio_inputs,
+        outputs=audiogram_plot
+    )
 
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", inbrowser=True, head=custom_head)

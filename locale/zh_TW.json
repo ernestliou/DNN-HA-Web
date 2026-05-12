@@ -42,7 +42,7 @@
     "analysis_plot_lbl": "分析結果圖表",
     
     "tab_audiogram": "聽力圖設定 (Audiogram)",
-    "audio_title": "### 設定各頻率的聽力損失 (dB HL)",
+    "audio_title": "### 設定各頻率的聽力損失<br>(dB HL)",
     "btn_save_audio": "💾 儲存設定 (預設)",
     "btn_load_audio": "📂 讀取聽力圖 JSON",
     "btn_update_plot": "🔄 更新圖表",
@@ -76,5 +76,16 @@
     "msg_audio_pls_file": "⚠️ 請選擇檔案",
     "msg_audio_loaded": "✅ 聽力圖載入成功！",
     "msg_audio_fmt_err": "❌ 格式錯誤：應為包含 9 個數字的 JSON 列表",
-    "msg_audio_load_err": "❌ 載入失敗：{err}"
+    "msg_audio_load_err": "❌ 載入失敗：{err}",
+    
+    "plot_title": "聽力圖 (Audiogram)",
+    "plot_y_normal": "正常 (Normal)",
+    "plot_y_mild": "輕度 (Mild)",
+    "plot_y_moderate": "中度 (Moderate)",
+    "plot_y_mod_severe": "中重度 (Mod-Severe)",
+    "plot_y_severe": "重度 (Severe)",
+    "plot_y_profound": "極重度 (Profound)",
+    "plot_ai_core": "AI 核心處理範圍",
+    "plot_dsp_linear": "DSP 線性補償區",
+    "plot_dead_region": "死區"
 }

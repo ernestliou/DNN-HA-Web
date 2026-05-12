@@ -80,7 +80,82 @@ def simulate_hearing_loss(audio_data, fs, audiogram_freqs, audiogram_loss):
     simulated_audio = sp_sig.convolve(audio_data, taps, mode='same')
     return simulated_audio
 
-def stream_process(audio, mode, l_val, sim_gain_db, *audiogram_args):
+_profound_taps_cache = {}
+
+def get_profound_loss_taps(fs, audiogram_freqs, audiogram_loss):
+    key = (fs, tuple(audiogram_freqs), tuple(audiogram_loss))
+    if key in _profound_taps_cache:
+        return _profound_taps_cache[key]
+        
+    nyq = fs / 2
+    freqs = [0.0] + list(audiogram_freqs) + [nyq]
+    gains_linear = []
+    
+    for loss in audiogram_loss:
+        if loss > 70:
+            c_ihc_db = -(loss - 70)
+            gains_linear.append(10**(c_ihc_db / 20.0))
+        else:
+            gains_linear.append(1.0)
+            
+    gains_linear = [gains_linear[0]] + gains_linear + [gains_linear[-1]]
+    
+    normalized_freqs = [f / nyq for f in freqs]
+    valid_freqs = []
+    valid_gains = []
+    for f, g in zip(normalized_freqs, gains_linear):
+        if f <= 1.0:
+            if valid_freqs and f <= valid_freqs[-1]:
+                continue
+            valid_freqs.append(f)
+            valid_gains.append(g)
+            
+    if valid_freqs[-1] < 1.0:
+        valid_freqs.append(1.0)
+        valid_gains.append(valid_gains[-1])
+        
+    numtaps = 1025
+    taps = sp_sig.firwin2(numtaps, valid_freqs, valid_gains)
+    _profound_taps_cache[key] = taps
+    return taps
+
+def apply_profound_loss_logic(audio, audiogram):
+    """
+    計算聽力圖超過 70 dB 的部分，對音訊套用額外的線性增益與減少 15% 的動態範圍壓縮（模擬 IHC 傳導損失）。
+    """
+    taps = get_profound_loss_taps(FS_MODEL, FREQS, audiogram)
+    filtered_audio = sp_sig.convolve(audio, taps, mode='same')
+    
+    # 減少 15% 的動態範圍壓縮 (Amplitude scaling)
+    out_audio = filtered_audio * 0.85
+    
+    return out_audio
+        
+    return out_audio
+
+def apply_post_mask(audio, original_audiogram):
+    """
+    推論防護後處理：
+    如果 original_audiogram 中有頻率 >= 90 dB，使用 IIR Notch 濾波器將該頻點及其鄰近頻帶增益設為 0。
+    """
+    out_audio = audio.copy()
+    fs = FS_MODEL
+    nyq = fs / 2
+    
+    for i, loss in enumerate(original_audiogram):
+        if loss >= 90:
+            freq = FREQS[i]
+            # 確保 freq 在有效範圍內
+            if 0 < freq < nyq:
+                # 設定 Notch 濾波器，w0 為正規化頻率，Q 決定頻寬 (Q=5 涵蓋較寬的鄰近頻帶)
+                w0 = freq / nyq
+                Q = 5.0
+                b, a = sp_sig.iirnotch(w0, Q)
+                out_audio = sp_sig.lfilter(b, a, out_audio)
+                
+    return out_audio
+
+def stream_process(audio, mode, l_val, sim_gain_db, profound_mode, *audiogram_args):
     """
     即時串流處理函式
     """
@@ -123,8 +198,8 @@ def stream_process(audio, mode, l_val, sim_gain_db, *audiogram_args):
             stim_padded = stim
             
         stim_input = stim_padded.reshape(1, -1, 1)
-        audiogram_input = np.array(audiogram_args).reshape(1, 1, 9)
-        audiogram_rep = np.tile(audiogram_input, (1, stim_input.shape[1]//64, 1))
+        safe_audiogram_input = np.clip(np.array(audiogram_args), 0, 70).reshape(1, 1, 9)
+        audiogram_rep = np.tile(safe_audiogram_input, (1, stim_input.shape[1]//64, 1))
         
         # 執行推論
         stimp = modelp.predict([stim_input, audiogram_rep], verbose=0)
@@ -133,6 +208,11 @@ def stream_process(audio, mode, l_val, sim_gain_db, *audiogram_args):
         if rem:
             out_y = out_y[:stim_len]
             
+        if profound_mode:
+            out_y = apply_post_mask(out_y, list(audiogram_args))
+            out_y = apply_profound_loss_logic(out_y, list(audiogram_args))
+            
+        out_y = np.nan_to_num(out_y)
         max_out = np.max(np.abs(out_y))
         if max_out > 0:
             out_y = (out_y / max_out) * 0.1 # 即時模式音量略低以防爆音
@@ -141,7 +221,7 @@ def stream_process(audio, mode, l_val, sim_gain_db, *audiogram_args):
     out_y_int = np.clip(out_y * 32767, -32768, 32767).astype(np.int16)
     return (int(FS_MODEL), out_y_int), out_y
 
-def process_audio(wavfile_input, l_val, snr_str, frame_size_val, sim_gain_db, *audiogram_args):
+def process_audio(wavfile_input, l_val, snr_str, frame_size_val, sim_gain_db, profound_mode, *audiogram_args):
     """
     Gradio 的主要處理邏輯
     """
@@ -198,7 +278,8 @@ def process_audio(wavfile_input, l_val, snr_str, frame_size_val, sim_gain_db, *a
         else:
             stim_cropped = stim
             
-        audiogram_rep = np.tile(audiogram_input, (stim_cropped.shape[0], int(stim_cropped.shape[1]/(2**NENC)), 1))
+        safe_audiogram_input = np.clip(np.array(audiogram_input), 0, 70).reshape(1, 1, 9)
+        audiogram_rep = np.tile(safe_audiogram_input, (stim_cropped.shape[0], int(stim_cropped.shape[1]/(2**NENC)), 1))
         
         t = time.time()
         stimp_cropped = modelp.predict([stim_cropped, audiogram_rep])
@@ -226,6 +307,13 @@ def process_audio(wavfile_input, l_val, snr_str, frame_size_val, sim_gain_db, *a
             
         out_filename = os.path.join(save_wav_dir, f"{base_name}_WEB_processed_20k.wav")
         raw_out_audio = stimp[0,0,:,0]
+        
+        # 套用極重度聽損邏輯 (DNN模型推論後執行)
+        if profound_mode:
+            raw_out_audio = apply_post_mask(raw_out_audio, audiogram_input)
+            raw_out_audio = apply_profound_loss_logic(raw_out_audio, audiogram_input)
+            
+        raw_out_audio = np.nan_to_num(raw_out_audio)
         max_out = np.max(np.abs(raw_out_audio))
         if max_out > 0:
             norm_audio = (raw_out_audio / max_out) * 0.8

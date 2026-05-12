@@ -42,7 +42,7 @@
     "analysis_plot_lbl": "Analysis Result Chart",
     
     "tab_audiogram": "Audiogram",
-    "audio_title": "### Configure Hearing Loss by Frequency (dB HL)",
+    "audio_title": "### Configure Hearing Loss by Frequency<br>(dB HL)",
     "btn_save_audio": "💾 Save Config (Default)",
     "btn_load_audio": "📂 Load Audiogram JSON",
     "btn_update_plot": "🔄 Update Chart",
@@ -76,5 +76,16 @@
     "msg_audio_pls_file": "⚠️ Please select a file",
     "msg_audio_loaded": "✅ Audiogram loaded successfully!",
     "msg_audio_fmt_err": "❌ Format error: Expected a JSON list containing 9 numbers",
-    "msg_audio_load_err": "❌ Load failed: {err}"
+    "msg_audio_load_err": "❌ Load failed: {err}",
+    
+    "plot_title": "Audiogram",
+    "plot_y_normal": "Normal",
+    "plot_y_mild": "Mild",
+    "plot_y_moderate": "Moderate",
+    "plot_y_mod_severe": "Mod-Severe",
+    "plot_y_severe": "Severe",
+    "plot_y_profound": "Profound",
+    "plot_ai_core": "AI Core Processing Range",
+    "plot_dsp_linear": "DSP Linear Comp. Range",
+    "plot_dead_region": "Dead Region"
 }

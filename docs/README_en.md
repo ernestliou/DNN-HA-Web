@@ -15,6 +15,7 @@ While the core AI model comes from the original authors, this derivative project
 3. **Advanced Data and Chart Analysis**: Built-in professional charts such as Time-domain Waveform, Spectrogram, and 1/3 Octave Band analysis. It also incorporates the "Speech Banana" as a clinical reference.
 4. **Pure Tone Generator**: Integrates a real-time audio synthesizer using the Web Audio API, making it convenient for quick hearing tests or equipment calibration.
 5. **Multilingual Interface**: Supports both **English (en_US)** and **Traditional Chinese (zh_TW)**. The system automatically detects the OS language and provides a dropdown menu for seamless real-time switching.
+6. **Profound Hearing Loss Support & Safety Mechanisms**: Extends the audiogram range to 120 dB HL. Integrates explicit DSP post-processing for "Dead Regions" (Notch filters) and IHC linear attenuation/compression reduction for severe losses, while ensuring safe DNN inference limits.
 
 ## 🚀 How to Launch this Testing Platform
 
